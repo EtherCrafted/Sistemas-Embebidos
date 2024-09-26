@@ -70,12 +70,15 @@ int main(void) {
         decenas = contador / 10;    // Descomposicion en decenas
         unidades = contador % 10;   // Descomposicion en unidades
         PORTD |= (1 << PD0);        // Habilita el diplay de 7 seg. de unidades
-        fun_7seg(unidades)          // Muestra el valor de unidades en el display
+        fun_7seg(unidades);         // Muestra el valor de unidades en el display
         _delay_ms(100);             // Retraso para que se visualice correctamente
         PORTD &= ~(1 << PD0);       // Deshabilita el diplay de 7 seg. de unidades
         PORTD |= (1 << PD1);        // Habilita el diplay de 7 seg. de decenas
-        fun_7seg(decenas)           // Muestra el valor de decenas en el display
+        fun_7seg(decenas);          // Muestra el valor de decenas en el display
         _delay_ms(100);             // Retraso para que se visualice correctamente
         PORTD &= ~(1 << PD1);       // Deshabilita el diplay de 7 seg. de decenas
+        if(contador > 99){          // Reinicir el contador si es mayor a 99
+            contador = 0;
+        }
     }
 }
