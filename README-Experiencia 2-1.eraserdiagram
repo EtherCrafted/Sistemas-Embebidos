@@ -1,0 +1,67 @@
+flowchart-diagram
+
+title Experiencia 2
+Inicialización [shape: oval, icon: power, color: green] > Incluir Librerías [icon: file-text]
+Incluir Librerías > Definir Variables y Constantes [icon: list]
+Definir Variables y Constantes > Definir Funciones
+Definir Funciones > Int main [icon: code]
+
+Función fun_puertos [color: green, icon: code] {
+  Configurar DDRD = 0bxxxx1111 [icon: settings]
+  Configurar DDRB = 0b111100xx [icon: settings]
+}
+Funcion fun_init[color: red, icon: code]{
+  Configurar PD3-PD2 con pull-up[icon:settings]
+  Inicializar puerto PB en '0' [icon: play-circle]
+}
+Funcion fun_interrupsiones[color: orange]{
+  Configurar EICRA=0x0A[icon:arrow-down]
+  Configurar EIMSK=0x03[icon:check-circle]
+  Configurar EIFR=0x00 [icon: flag]
+  Llamar sei() [icon: check-circle]
+}
+ISR INT0_vect[icon:code,color: purple]{
+  Decrementar contador --
+}
+ISR INT1_vect[color: purple,icon:code]{
+  Incrementar contador ++
+}
+Función fun_7seg {
+Número es mayor que 9 [shape: diamond, icon: help-circle]
+Retornar [shape: oval, icon: arrow-left]
+Definir out_deco [icon: list]
+Establecer PORTB [icon: settings]
+Comprobar bit 6 de out_deco [shape: diamond, icon: help-circle]
+Establecer PORTC0 '1' [icon: settings]
+Establecer PORTC0 '0'[icon: settings]
+ }
+  Número es mayor que 9 > Retornar: Sí
+  Número es mayor que 9 > Definir out_deco: No
+  Definir out_deco > Establecer PORTB
+  Establecer PORTB > Comprobar bit 6 de out_deco
+  Comprobar bit 6 de out_deco > Establecer PORTC0 '1': Sí
+  Comprobar bit 6 de out_deco > Establecer PORTC0 '0': No
+
+Int main [color: yellow]{
+  Llamar a fun_puertos [icon: corner-down-right]
+  Llamar a fun_init [icon: corner-down-right]
+  Llamar a fun_interrupsiones [icon: corner-down-right]
+  Bucle infinito [shape: diamond, color: green, icon: repeat]
+  decenas de contador [icon: divide]
+  unidades de contador [icon: percent]
+  PD0=1 \n PD1=0 [icon: upload]
+  PD0=0 \n PD1=1 [icon: upload]
+  Llamar a fun_7seg decenas [icon: corner-down-right]
+  Llamar a fun_7seg unidades [icon: corner-down-right]
+  Si contador mayor a 99 [shape: diamond,icon: question]
+  contador = 0 [icon: circle]
+
+
+}
+Llamar a fun_puertos > Llamar a fun_init > Llamar a fun_interrupsiones > Bucle infinito > decenas de contador > unidades de contador > PD0=1 \n PD1=0 > Llamar a fun_7seg unidades > PD0=0 \n PD1=1 > Llamar a fun_7seg decenas > Si contador mayor a 99
+ Si contador mayor a 99 > contador = 0:Si
+  Si contador mayor a 99 > Bucle infinito:No
+  contador = 0 > Bucle infinito
+
+
+

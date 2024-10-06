@@ -1,0 +1,47 @@
+flowchart-diagram
+
+title Experiencia 1
+direction down
+Inicialización [shape: oval, icon: power, color: green] > Incluir Librerías [icon: file-text]
+Incluir Librerías > Definir Variables y Constantes [icon: list]
+Definir Variables y Constantes > Definir Funciones
+Definir Funciones > Int main [icon: code]
+
+Función fun_puertos [color: green, icon: code] {
+  Configurar DDRD = 0b111100xx [icon: settings]
+  Configurar DDRB = 0bxxxx1111 [icon: settings]
+  
+}
+Funcion fun_init[color: red, icon: code]{
+  Configurar PD3-PD2 con pull-up[icon:settings]
+  Inicializar puerto PB en '0' [icon: play-circle]
+}
+Funcion fun_interrupsiones[color: orange]{
+  Configurar EICRA=0x0A[icon:arrow-down]
+  Configurar EIMSK=0x03[icon:check-circle]
+  Configurar EIFR=0x00 [icon: flag]
+  Llamar sei() [icon: check-circle]
+}
+ISR INT0_vect[icon:code,color: purple]{
+  Decrementar contador --
+}
+ISR INT1_vect[color: purple,icon:code]{
+  Incrementar contador ++
+}
+Int main [color: yellow]{
+  Llamar a fun_puertos [icon: corner-down-right]
+  Llamar a fun_interrupsiones [icon: corner-down-right]
+  Llamar a fun_init [icon: corner-down-right]
+  Bucle infinito [shape: diamond, color: green, icon: repeat]
+  Establecer PORTD|4..7| 'contador|0..3|' [icon: settings]
+  Establecer PORTB|0..3| 'contador|4..7|' [icon: settings]
+}
+Llamar a fun_puertos > Llamar a fun_init > Llamar a fun_interrupsiones
+Llamar a fun_interrupsiones > Bucle infinito
+Bucle infinito > Establecer PORTD|4..7| 'contador|0..3|'
+Establecer PORTD|4..7| 'contador|0..3|'> Establecer PORTB|0..3| 'contador|4..7|'
+Establecer PORTB|0..3| 'contador|4..7|'> Bucle infinito
+
+
+
+
