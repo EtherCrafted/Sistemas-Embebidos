@@ -62,6 +62,3 @@ Llamar a fun_puertos > Llamar a fun_init > Llamar a fun_interrupsiones > Bucle i
  Si contador mayor a 99 > contador = 0:Si
   Si contador mayor a 99 > Bucle infinito:No
   contador = 0 > Bucle infinito
-
-
-
