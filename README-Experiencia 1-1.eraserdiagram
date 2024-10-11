@@ -41,7 +41,3 @@ Llamar a fun_interrupsiones > Bucle infinito
 Bucle infinito > Establecer PORTD|4..7| 'contador|0..3|'
 Establecer PORTD|4..7| 'contador|0..3|'> Establecer PORTB|0..3| 'contador|4..7|'
 Establecer PORTB|0..3| 'contador|4..7|'> Bucle infinito
-
-
-
-
