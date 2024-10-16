@@ -1,71 +1,96 @@
-#define F_CPU 16000000  //frecuencias del Atmega328p
-// Librerias
-#include <avr/io.h>
-#include "util/delay.h"
-// decodificador para un display de 7 segmentos
-const  uint8_t buff_7seg[10] = {
-    0x3F,   //0b0011 1111    0
-    0x06,   //0b0000 0110    1
-    0x5B,   //0b0101 1011    2
-    0x4F,   //0b0100 1111    3
-    0x66,   //0b0110 0110    4
-    0x6D,   //0b0110 1101    5
-    0x7D,   //0b0111 1101    6
-    0x07,   //0b0000 0111    7
-    0x7F,   //0b0111 1111    8
-    0x6F    //0b0110 1111    9
-};
-//funcion con la configuracion de puertos
-void fun_puertos() {
-    DDRD = 0xFF;    // 1111 1111 PD0-PD7 configurados como salida (8 leds)
-    DDRB |= 0x3F;   // xx11 1111 PB0-PB5 configurados como salida (6 bit Disp_7seg)
-    DDRC |= 0x01;   // xxxx xxx1 PC0 configurado como salida (1 bit Disp_7seg)
-}
+/**
+  Generated main.c file from MPLAB Code Configurator
 
-// Funcion para mostrar un numero en un display de 7 segmentos
-void fun_7seg(uint8_t numero) {
-    if (numero > 9) return;    // Verifica que el numero este entre 0 y 9
-    uint8_t out_deco = buff_7seg[numero];   // numero decodificado
-    PORTB = out_deco & 0x3F;    // Los 6 primeros bits (a-f) se envían al puerto B
-    // El bit más significativo (g) se envía al pin C0
-    if (out_deco & 0x40) {  // Verifica si el bit 6 de un elemento del arreglo buff_7seg es 1
-        PORTC |= (1 << 0);  // Establece el bit C0 en 1
-    } else {
-        PORTC &= ~(1 << 0); // Establece el bit C0 en 0
-    }
-}
+  @Company
+    Microchip Technology Inc.
 
-//Main
-int main(void) {
-    fun_puertos();  // Se llama a la funcion que contiene la configuracion de puertos 
-    uint8_t i = 0;  // Varible de conteo ascendente de los leds
-    uint8_t j = 6;  // Variable de conteo descendente de los leds
-    uint8_t cont_1 = 0; // Variable de conteo ascendente del Display de 7 segmentos
-    // bucle principal
-    while (1) {
-        // Recorrido descendente de los leds 
-        if(i > 7){      // Si el contador ascendente llego al final i > 7
-            if(j == 0){ // SI en contador descendente llego al final j = 0
-                i = 0;  // Reiniciar el contador ascendente
-                j = 6;  // Reiniciar el contador descendente
-            }
-            else{
-                PORTD = (1 << j);   // Salida de los led en funcion de j
-                _delay_ms(200);     // Retraso para su visualizacion
-                j--;                // Reducir en 1 el valor de contador j
-            }            
-        }
-        // Recorrido ascendente de los leds
-        else{
-            PORTD = (1 << i);   // Salida de los led en funcion de i
-            _delay_ms(200);     // Retraso para su visualizacion
-            i++;                // Incrementar en 1 el valor de contador i
-        }
-        // Recorrido del contador en el display de 7 segmentos 
-        fun_7seg(cont_1);   // Llamar a la funcion que decodifica los numeros
-        cont_1++;           // Incrementar en 1 el valor de contador cont_1
-        if(cont_1 > 9){     // Si el contador cont_1 alcaza su valor maximo cont_1 > 9
-            cont_1 = 0;     // Reiniciar el contador cont_1 = 0
-        }
-    }
+  @File Name
+    main.c
+
+  @Summary
+    This is the generated main.c using PIC24 / dsPIC33 / PIC32MM MCUs.
+
+  @Description
+    This source file provides main entry point for system initialization and application code development.
+    Generation Information :
+        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - 1.171.4
+        Device            :  PIC24FJ256GB110
+    The generated drivers are tested against the following:
+        Compiler          :  XC16 v2.10
+        MPLAB 	          :  MPLAB X v6.05
+*/
+
+/*
+    (c) 2020 Microchip Technology Inc. and its subsidiaries. You may use this
+    software and any derivatives exclusively with Microchip products.
+
+    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+
+    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+
+    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+    TERMS.
+*/
+
+/**
+  Section: Included Files
+*/
+#define  FCY 16000000UL
+#include "mcc_generated_files/system.h"
+#include "libpic30.h"
+
+uint8_t cont;
+N rotd = 0x80;
+uint8_t roti = 0x01;
+/**/
+void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  )
+{
+    _LATG14 = (roti & 0x01) >> 0;
+    _LATG6  = (roti & 0x02) >> 1;
+    _LATG7  = (roti & 0x04) >> 2;
+    _LATG8  = (roti & 0x08) >> 3;
+    _LATD9  = (roti & 0x10) >> 4;
+    _LATF2  = (roti & 0x20) >> 5;
+    _LATF4  = (roti & 0x40) >> 6;
+    _LATF5  = (roti & 0x80) >> 7;
+    roti = roti << 1;
+    if(roti == 0x00){roti = 0x01;}
+
+        
+    IFS0bits.T1IF = 0;
 }
+void __attribute__ ( ( interrupt, no_auto_psv ) ) _T3Interrupt (  ){
+    _LATD13  = (rotd & 0x01) >> 0;
+    _LATA14 = (rotd & 0x02) >> 1;
+    _LATA15  = (rotd & 0x04) >> 2;
+    _LATD10  = (rotd & 0x08) >> 3;
+    _LATC4  = (rotd & 0x10) >> 4;
+    _LATD0  = (rotd & 0x20) >> 5;
+    _LATB14  = (rotd & 0x40) >> 6;
+    _LATG13 = (rotd & 0x80) >> 7;
+
+    rotd = rotd >> 1;
+    if(rotd == 0x00){rotd = 0x80;}
+    IFS0bits.T3IF = 0;
+}
+int main(void){
+    SYSTEM_Initialize();
+    while (1){
+    }
+
+    return 1;
+}
+/**
+ End of File
+*/
+
