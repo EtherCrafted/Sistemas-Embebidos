@@ -46,48 +46,47 @@
   Section: Included Files
 */
 #define  FCY 16000000UL
-#include "mcc_generated_files/system.h"
-#include "libpic30.h"
+#include "mcc_generated_files/system.h" //Configuraciones del MCC
 
-uint8_t cont;
-N rotd = 0x80;
-uint8_t roti = 0x01;
+uint8_t cont; //Variable contador 
+uint8_t rotd = 0x80;  // Variable de rotacion a la derecha
+uint8_t roti = 0x01;  // Variable de rotacion a la izquierda
 /**/
+// Funcion de Interrupcion del timer 1 Configurado a 100ms
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  )
 {
-    _LATG14 = (roti & 0x01) >> 0;
-    _LATG6  = (roti & 0x02) >> 1;
-    _LATG7  = (roti & 0x04) >> 2;
-    _LATG8  = (roti & 0x08) >> 3;
-    _LATD9  = (roti & 0x10) >> 4;
-    _LATF2  = (roti & 0x20) >> 5;
-    _LATF4  = (roti & 0x40) >> 6;
-    _LATF5  = (roti & 0x80) >> 7;
-    roti = roti << 1;
-    if(roti == 0x00){roti = 0x01;}
-
-        
-    IFS0bits.T1IF = 0;
+    _LATG14 = (roti & 0x01) >> 0; //bit 0x01 de  roti
+    _LATG6  = (roti & 0x02) >> 1; //bit 0x02 de  roti
+    _LATG7  = (roti & 0x04) >> 2; //bit 0x04 de  roti
+    _LATG8  = (roti & 0x08) >> 3; //bit 0x08 de  roti
+    _LATD9  = (roti & 0x10) >> 4; //bit 0x10 de  roti
+    _LATF2  = (roti & 0x20) >> 5; //bit 0x20 de  roti
+    _LATF4  = (roti & 0x40) >> 6; //bit 0x40 de  roti
+    _LATF5  = (roti & 0x80) >> 7; //bit 0x80 de  roti
+    roti = roti << 1; // desplaza a la izquierda roti en 1 bit
+    //Si el unico bit de roti "sale" de los 8 bits se reinicia a 0x01
+    if(roti == 0x00){roti = 0x01;}  
+    IFS0bits.T1IF = 0;  //Baja la bandera del timer 1
 }
+// Funcion de Interrupcion del timer 3 Configurado a 500ms
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _T3Interrupt (  ){
-    _LATD13  = (rotd & 0x01) >> 0;
-    _LATA14 = (rotd & 0x02) >> 1;
-    _LATA15  = (rotd & 0x04) >> 2;
-    _LATD10  = (rotd & 0x08) >> 3;
-    _LATC4  = (rotd & 0x10) >> 4;
-    _LATD0  = (rotd & 0x20) >> 5;
-    _LATB14  = (rotd & 0x40) >> 6;
-    _LATG13 = (rotd & 0x80) >> 7;
-
-    rotd = rotd >> 1;
+    _LATD13 = (rotd & 0x01) >> 0; //bit 0x01 de  rotd
+    _LATA14 = (rotd & 0x02) >> 1; //bit 0x02 de  rotd
+    _LATA15 = (rotd & 0x04) >> 2; //bit 0x04 de  rotd
+    _LATD10 = (rotd & 0x08) >> 3; //bit 0x08 de  rotd
+    _LATC4  = (rotd & 0x10) >> 4; //bit 0x10 de  rotd
+    _LATD0  = (rotd & 0x20) >> 5; //bit 0x20 de  rotd
+    _LATB14 = (rotd & 0x40) >> 6; //bit 0x40 de  rotd
+    _LATG13 = (rotd & 0x80) >> 7; //bit 0x80 de  rotd
+    rotd = rotd >> 1; // desplaza a la derecha rotd en 1 bit
+    //Si el unico bit de rotd "sale" de los 8 bits se reinicia a 0x80
     if(rotd == 0x00){rotd = 0x80;}
-    IFS0bits.T3IF = 0;
+    IFS0bits.T3IF = 0;  //Baja la bandera del timer 3
 }
 int main(void){
-    SYSTEM_Initialize();
+    SYSTEM_Initialize();  // initialize the device
     while (1){
     }
-
     return 1;
 }
 /**
