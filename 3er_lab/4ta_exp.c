@@ -46,8 +46,7 @@
   Section: Included Files
 */
 #define  FCY 16000000UL
-#include "mcc_generated_files/system.h"
-#include "libpic30.h"
+#include "mcc_generated_files/system.h" //Configuraciones del MCC
 
 unsigned contador = 0;  // Variable contador
 unsigned decenas = 0;   // Variable decenas de contador
@@ -65,38 +64,39 @@ const  uint8_t buff_7seg[10] = {
     0x7F,   //0b0111 1111    8
     0x6F    //0b0110 1111    9
 };
+// Funcion de Interrupcion del timer 3 Configurado a 500ms
 void __attribute__ ( ( interrupt, no_auto_psv ) ) _T3Interrupt (  ){
     
-    uint8_t out_deco1 = buff_7seg[decenas];
-    _LATD13  = (out_deco1 & 0x01) >> 0;
-    _LATA14 = (out_deco1 & 0x02) >> 1;
-    _LATA15  = (out_deco1 & 0x04) >> 2;
-    _LATD10  = (out_deco1 & 0x08) >> 3;
-    _LATC4  = (out_deco1 & 0x10) >> 4;
-    _LATD0  = (out_deco1 & 0x20) >> 5;
-    _LATB14  = (out_deco1 & 0x40) >> 6;
-    _LATG13 = (out_deco1 & 0x80) >> 7;
+    uint8_t out_deco1 = buff_7seg[decenas]; // decodifica las decenas en out_deco1
+    _LATD13 = (out_deco1 & 0x01) >> 0;     //bit 0x01 de las out_deco1(decenas)
+    _LATA14 = (out_deco1 & 0x02) >> 1;     //bit 0x02 de las out_deco1(decenas)
+    _LATA15 = (out_deco1 & 0x04) >> 2;     //bit 0x04 de las out_deco1(decenas)
+    _LATD10 = (out_deco1 & 0x08) >> 3;     //bit 0x08 de las out_deco1(decenas)
+    _LATC4  = (out_deco1 & 0x10) >> 4;     //bit 0x10 de las out_deco1(decenas)
+    _LATD0  = (out_deco1 & 0x20) >> 5;     //bit 0x20 de las out_deco1(decenas)
+    _LATB14 = (out_deco1 & 0x40) >> 6;     //bit 0x40 de las out_deco1(decenas)
+    _LATG13 = (out_deco1 & 0x80) >> 7;     //bit 0x80 de las out_deco1(decenas)
 
-    uint8_t out_deco2 = buff_7seg[unidades];
-    _LATG14 = (out_deco2 & 0x01) >> 0;
-    _LATG6  = (out_deco2 & 0x02) >> 1;
-    _LATG7  = (out_deco2 & 0x04) >> 2;
-    _LATG8  = (out_deco2 & 0x08) >> 3;
-    _LATD9  = (out_deco2 & 0x10) >> 4;
-    _LATF2  = (out_deco2 & 0x20) >> 5;
-    _LATF4  = (out_deco2 & 0x40) >> 6;
-    _LATF5  = (out_deco2 & 0x80) >> 7;
-    contador++;
-    IFS0bits.T3IF = 0;
+    uint8_t out_deco2 = buff_7seg[unidades];  // decodifica las unidades en out_deco2
+    _LATG14 = (out_deco2 & 0x01) >> 0;     //bit 0x01 de las out_deco2(decenas)
+    _LATG6  = (out_deco2 & 0x02) >> 1;     //bit 0x02 de las out_deco2(decenas)
+    _LATG7  = (out_deco2 & 0x04) >> 2;     //bit 0x04 de las out_deco2(decenas)
+    _LATG8  = (out_deco2 & 0x08) >> 3;     //bit 0x08 de las out_deco2(decenas)
+    _LATD9  = (out_deco2 & 0x10) >> 4;     //bit 0x10 de las out_deco2(decenas)
+    _LATF2  = (out_deco2 & 0x20) >> 5;     //bit 0x20 de las out_deco2(decenas)
+    _LATF4  = (out_deco2 & 0x40) >> 6;     //bit 0x40 de las out_deco2(decenas)
+    _LATF5  = (out_deco2 & 0x80) >> 7;     //bit 0x80 de las out_deco2(decenas)
+    contador++; //Incrementa el contador en 1
+    IFS0bits.T3IF = 0;  //Baja la bandera del timer 3
 }
 int main(void){
     
     
-    SYSTEM_Initialize();
+    SYSTEM_Initialize();  // initialize the device
     while (1){
         decenas = contador / 10;    // Descomposicion en decenas
         unidades = contador % 10;   // Descomposicion en unidades
-        if(contador == 100){contador =0;}
+        if(contador == 100){contador =0;} //Si el contador excede a 99 reinicia contador
     }
 
     return 1;
