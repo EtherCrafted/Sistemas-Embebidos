@@ -48,22 +48,36 @@
 #define  FCY 16000000UL
 #include "mcc_generated_files/system.h"  //Configuraciones del MCC
 #include "libpic30.h" // Libreria para el delay
+#include "string.h"
+#include "stdio.h"
 
 uint8_t dato_rx;
 uint8_t flag_rx = 0;
 uint8_t cont_1 = 0;
 uint8_t index = 0;
+char EnM1[] = "Encender Motor 1";
+char DisM1[] = "Apagar Motor 1";
+char EnM2[] = "Encender Motor 2";
+char DisM2[] = "Apagar Motor 2";
 
-char buf_rx[800];
-unsigned char datos = 0;
+char RX_data[] = "";
+
+
+uint8_t dato_b1_e = 0;
+uint8_t dato_b1_a = 0;
+uint8_t dato_b2_e = 0;
+uint8_t dato_b2_a = 0;
+
+char buf_rx[17];
 
 void UART1_Receive_ISR(void)
 {
    dato_rx = U1RXREG;
    buf_rx[index] = dato_rx;
    IFS0bits.U1RXIF = 0;
-    index++;
-    flag_rx = 1;
+   index++;
+   flag_rx = 1;
+     
 }
 // visualizar grupo 1 
 void Out_G1(uint8_t dato){
@@ -76,20 +90,67 @@ void Out_G1(uint8_t dato){
   _LATB14 = (dato & 0x40) >> 6; //bit 0x40 de  dato
   _LATG13 = (dato & 0x80) >> 7; //bit 0x80 de  dato
 }
+void Write_com(uint8_t a,char b[]){
+    if (a == 0){
+            for (int i = 0; i < strlen(b);i++){
+                UART1_Write(b[i]);
+                __delay_ms(10); 
+            }
+        }
+}
+void Read_com(uint8_t a,char b[],char c){
+    char EnM1[] = "Encender Motor 1";
+    char DisM1[] = "Apagar Motor 1";
+    char EnM2[] = "Encender Motor 2";
+    char DisM2[] = "Apagar Motor 2";
+        if (b != 0) {
+            if(c == EnM1){
+                _LATG6 = 1;
+            }
+            else if(c == DisM1){
+                _LATG6 = 0;
+            }
+            else if(c == EnM2){
+                _LATG7 = 1;
+            }
+            else if(c == DisM2){
+                _LATG7 = 0;
+            }
+            else{}
+            a=0;
+            
+        } 
+}
+
+
 int main(void){
     
     
     SYSTEM_Initialize();
     while (1){
-        cont_1++;
-        __delay_ms(500); 
-        
-        UART1_Write(cont_1);
-        if(flag_rx == 1){                    
-            Out_G1(dato_rx);
-            
-            flag_rx == 0;
-        } 
+        dato_b1_e = PORTFbits.RF13; 
+        dato_b1_a = PORTAbits.RA0; 
+        dato_b2_e = PORTAbits.RA1; 
+        dato_b2_a = PORTEbits.RE8; 
+        Write_com(dato_b1_e,EnM1);
+        Write_com(dato_b1_a,DisM1);
+        Write_com(dato_b2_e,EnM2);
+        Write_com(dato_b2_a,DisM2);
+        //Out_G1(strlen(EnM));
+//        cont_1++;
+//        __delay_ms(500); 
+//        
+//        UART1_Write(str[cont_1]);
+
+        char *respM1e = strstr(buf_rx, EnM1);
+        char *respM1a= strstr(buf_rx, DisM1);
+        char *respM2e = strstr(buf_rx, EnM2);
+        char *respM2a = strstr(buf_rx, DisM2);
+
+        Read_com(index,respM1e, EnM1);
+        Read_com(index,respM1a, DisM1);
+        Read_com(index,respM2e, EnM2);
+        Read_com(index,respM2a, DisM2);
     }
 
     return 1;
