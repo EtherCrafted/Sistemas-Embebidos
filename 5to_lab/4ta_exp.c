@@ -46,46 +46,61 @@
   Section: Included Files
 */
 #define  FCY 16000000UL
-#include "mcc_generated_files/system.h"
-#include "libpic30.h"
-unsigned dato_rx = 0;  // Variable contador
-unsigned buf[1000];   // Variable decenas de contador
-unsigned index = 0;  // Variable unidades de contador
+#include "mcc_generated_files/system.h"  //Configuraciones del MCC
+#include "libpic30.h" // Libreria para el delay
+#include "string.h"
+#include "stdio.h"
+
+uint8_t dato_rx;
+uint8_t flag_rx = 0;
+uint8_t cont_1 = 0;
+uint8_t index = 0;
+
+char EnL1[] = "Hola HC-05";
+char DisL1[] = "Adios HC-05";
 
 
-void __attribute__ ( ( interrupt, no_auto_psv ) ) _U1RXInterrupt( void )
+char buf_rx[17];
+
+void UART1_Receive_ISR(void)
 {
-    (*UART1_RxDefaultInterruptHandler)();
-
-    IFS0bits.U1RXIF = 0;
-    dato_rx = U1RXREG;
-    buf[index]=dato_rx;
+   dato_rx = U1RXREG;
+   buf_rx[index] = dato_rx;
+   IFS0bits.U1RXIF = 0;
     index++;
-    
+    flag_rx = 1;
+     
+}
+void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  ){
+    UART1_Write(cont_1 + 0x30);
+    cont_1++;
+    if (cont_1 == 0x0A){cont_1 = 0;}
+    IFS0bits.T1IF = 0;  //Baja la bandera del timer 1
 }
 
-
-const  uint8_t buff_7seg[10] = {
-    0x3F,   //0b0011 1111    0
-    0x06,   //0b0000 0110    1
-    0x5B,   //0b0101 1011    2
-    0x4F,   //0b0100 1111    3
-    0x66,   //0b0110 0110    4
-    0x6D,   //0b0110 1101    5
-    0x7D,   //0b0111 1101    6
-    0x07,   //0b0000 0111    7
-    0x7F,   //0b0111 1111    8
-    0x6F    //0b0110 1111    9
-};
-void __attribute__ ( ( interrupt, no_auto_psv ) ) _T3Interrupt (  ){
-
-    IFS0bits.T3IF = 0;
-}
 int main(void){
     
     
     SYSTEM_Initialize();
     while (1){
+        if(flag_rx == 1){                    
+            flag_rx == 0;
+        } 
+        char *respL1e = strstr(buf_rx, EnL1);
+        char *respL1a= strstr(buf_rx, DisL1);
+
+        if (respL1e != 0) {
+            _LATD9 = 1;
+            //RX_data[]="";
+            index=0;
+            
+        } 
+        if (respL1a != 0) {
+            _LATD9 = 0;
+            //RX_data[]="";
+            index=0;
+        }
+     
     }
 
     return 1;

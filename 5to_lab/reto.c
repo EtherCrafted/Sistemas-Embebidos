@@ -49,44 +49,47 @@
 #include "mcc_generated_files/system.h"
 
 unsigned char display_index = 0; 
-const uint8_t buff_7seg[8] = {
-    0x76, // 'H'
-    0x3F, // 'O'
-    0x38, // 'L'
-    0x77, // 'A'
-    0x00, // ' '
-    0x76, // 'G'
-    0x40, // '-'
-    0x77  // 'A'
+const uint8_t buff_7seg[10] = {
+  0x77, // 'R'
+  0x79, // 'E'
+  0x31, // 'T'
+  0x3F, // 'O'
+  0x00, // ' '
+  0x66, // '4'
+  0x40, // '-'
+  0x7D, // 'G'
+  0x40, // '-'
+  0x77  // 'A'
 };
 
 void mostrar_caracter_izq(uint8_t caracter) {
-    _LATD13 = (caracter & 0x01) >> 0;
-    _LATA14 = (caracter & 0x02) >> 1;
-    _LATA15 = (caracter & 0x04) >> 2;
-    _LATD10 = (caracter & 0x08) >> 3;
-    _LATC4  = (caracter & 0x10) >> 4;
-    _LATD0  = (caracter & 0x20) >> 5;
-    _LATB14 = (caracter & 0x40) >> 6;
+    _LATD13 = (caracter & 0x01) >> 0;     //bit 0x01 de las out_deco1(decenas)
+    _LATA14 = (caracter & 0x02) >> 1;     //bit 0x02 de las out_deco1(decenas)
+    _LATA15 = (caracter & 0x04) >> 2;     //bit 0x04 de las out_deco1(decenas)
+    _LATD10 = (caracter & 0x08) >> 3;     //bit 0x08 de las out_deco1(decenas)
+    _LATC4  = (caracter & 0x10) >> 4;     //bit 0x10 de las out_deco1(decenas)
+    _LATD0  = (caracter & 0x20) >> 5;     //bit 0x20 de las out_deco1(decenas)
+    _LATB14 = (caracter & 0x40) >> 6;     //bit 0x40 de las out_deco1(decenas)
+    _LATG13 = (caracter & 0x80) >> 7;     //bit 0x80 de las out_deco1(decenas)
 }
 
 void mostrar_caracter_der(uint8_t caracter) {
-    _LATG14 = (caracter & 0x01) >> 0;
-    _LATG6  = (caracter & 0x02) >> 1;
-    _LATG7  = (caracter & 0x04) >> 2;
-    _LATG8  = (caracter & 0x08) >> 3;
-    _LATD9  = (caracter & 0x10) >> 4;
-    _LATF2  = (caracter & 0x20) >> 5;
-    _LATF4  = (caracter & 0x40) >> 6;
-    _LATF5  = (caracter & 0x80) >> 7;
+    _LATG14 = (caracter & 0x01) >> 0;     //bit 0x01 de las out_deco2(decenas)
+    _LATG6  = (caracter & 0x02) >> 1;     //bit 0x02 de las out_deco2(decenas)
+    _LATG7  = (caracter & 0x04) >> 2;     //bit 0x04 de las out_deco2(decenas)
+    _LATG8  = (caracter & 0x08) >> 3;     //bit 0x08 de las out_deco2(decenas)
+    _LATD9  = (caracter & 0x10) >> 4;     //bit 0x10 de las out_deco2(decenas)
+    _LATF2  = (caracter & 0x20) >> 5;     //bit 0x20 de las out_deco2(decenas)
+    _LATF4  = (caracter & 0x40) >> 6;     //bit 0x40 de las out_deco2(decenas)
+    _LATF5  = (caracter & 0x80) >> 7;     //bit 0x80 de las out_deco2(decenas)
 }
 void __attribute__((interrupt, no_auto_psv)) _T3Interrupt(void) {
 
     mostrar_caracter_izq(buff_7seg[display_index]);
-    mostrar_caracter_der(buff_7seg[(display_index + 1) % 7]);
+    mostrar_caracter_der(buff_7seg[(display_index + 1) % 9]);
 
     display_index++;
-    if (display_index >= 7) {
+    if (display_index >= 9) {
         display_index = 0; 
     }
 
